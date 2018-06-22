@@ -4,69 +4,58 @@ sudo: required
 dist: trusty
 services: docker
 osx_image: xcode6.4
-
 env:
   global:
-      - RC=rc2
-      - VERSION=2.5.0
-      - STAGING=https://dist.apache.org/repos/dist/dev/beam/${VERSION}/
-      - ZIP_FILE=apache-beam-${VERSION}-python.zip
-
-      - PLAT=x86_64
-      - WHEELHOUSE_UPLOADER_USERNAME=jbonofre
-      - BUILD_DEPENDS="Cython"
-      - TEST_DEPENDS=
-      # Following generated with
-      # travis encrypt -r robertwb/apache-beam-wheels WHEELHOUSE_UPLOADER_SECRET=$WHEELHOUSE_UPLOADER_SECRET
-
-
+  - RC=rc2
+  - VERSION=2.5.0
+  - STAGING=https://dist.apache.org/repos/dist/dev/beam/${VERSION}/
+  - ZIP_FILE=apache-beam-${VERSION}-python.zip
+  - PLAT=x86_64
+  - WHEELHOUSE_UPLOADER_USERNAME=jbonofre
+  - BUILD_DEPENDS="Cython"
+  - TEST_DEPENDS=
+  - secure: qpO1zhmM3rOFaIbhQHRNb71JOeTFCx5/rUXgT0XKT+H/4GDcr962IeMYNrbc7g5oexPppJp3bVSFa6JIlKi0zWXh1eHYYx/cdQzXXiPP4LyeDDo4aU6emd+OxKYNpj2eEPryDHCPqlEzsRuNA3Pa+6puRyjiQYqVyFNsyvJwB5NcwqOMJ5wegRIbeJFh3VW6rbENAN+asc7JwzktU9HvcW44I4hlRE8PEi+ydpcQfVSFbBM1as74RiWNkAS6u3wjtJeIC2+AmhCgoKqhFP5vl+Wyi2gpeZ0OMv1rOktkWCGwOfp0P3P+3+dTIzjoAE0Rafr1aFh+Cah5hroYLTIyS7tlt4lK2+EA4q+P1XwLOCbe49nNGxl91/ZDE8zKzjEbgUknY6UoAGIsjPW2OaLkcgN7BmmzNJTiOv55+WXAi4/hNwR3fkMXVi3OdhAJ/Lbs1A84M3K78AFD0GdY8lBoKgBKBFD3Inet5NYt9Oyavp26Cg4nmL5aZsvWrysT16zxkvsdKNglMvg4903CByBH61rOE5SNuvqMRldSNgQaVqY/62nFJM0QMSe4PWNqUc/Qvf3/vdVxZaLtVVwgGKsEXHI3/eMQwmfWDg3JXhIWUUPzA4IJdXYStF+eLxeBucE145D/w3zHtkE1F/ihcCc/p2hG1Z5cin9ASzoO7XjH/Yc=
 matrix:
   exclude:
-    # Exclude the default Python 3.5 build
-    - python: 3.5
+  - python: 3.5
   include:
-   - os: osx
-     language: generic
-     env:
-       - MB_PYTHON_VERSION=2.7
-   - os: linux
-     env:
-       - MB_PYTHON_VERSION=2.7
-   - os: linux
-     env:
-       - MB_PYTHON_VERSION=2.7
-       - UNICODE_WIDTH=16
-   - os: linux
-     env:
-       - MB_PYTHON_VERSION=2.7
-       - PLAT=i686
-   - os: linux
-     env:
-       - MB_PYTHON_VERSION=2.7
-       - PLAT=i686
-       - UNICODE_WIDTH=16
-
+  - os: osx
+    language: generic
+    env:
+    - MB_PYTHON_VERSION=2.7
+  - os: linux
+    env:
+    - MB_PYTHON_VERSION=2.7
+  - os: linux
+    env:
+    - MB_PYTHON_VERSION=2.7
+    - UNICODE_WIDTH=16
+  - os: linux
+    env:
+    - MB_PYTHON_VERSION=2.7
+    - PLAT=i686
+  - os: linux
+    env:
+    - MB_PYTHON_VERSION=2.7
+    - PLAT=i686
+    - UNICODE_WIDTH=16
 before_install:
-    - source multibuild/common_utils.sh
-    - source multibuild/travis_steps.sh
-    - before_install
-
+- source multibuild/common_utils.sh
+- source multibuild/travis_steps.sh
+- before_install
 install:
-    - wget $STAGING/$ZIP_FILE
-    - unzip $ZIP_FILE
-
+- wget $STAGING/$ZIP_FILE
+- unzip $ZIP_FILE
 script:
-    - build_wheel apache-beam-${VERSION} $PLAT
-
+- build_wheel apache-beam-${VERSION} $PLAT
 after_success:
-    - TRAVIS_BUILD_DIR=.
-    - ls -lh ${TRAVIS_BUILD_DIR}/wheelhouse/
-    - pip install twine
-    - pip install pyOpenSSL ndg-httpsclient pyasn1
-    # Even the test pipy won't let you re-upload a pacakge under the same name.
-    - |
-      for artifact in ${TRAVIS_BUILD_DIR}/wheelhouse/*.*; do
-          mv $artifact ${artifact/$VERSION/$VERSION.$RC};
-      done
-    - source deploy_travis.sh
-    - deploy
+- TRAVIS_BUILD_DIR=.
+- ls -lh ${TRAVIS_BUILD_DIR}/wheelhouse/
+- pip install twine
+- pip install pyOpenSSL ndg-httpsclient pyasn1
+- |
+  for artifact in ${TRAVIS_BUILD_DIR}/wheelhouse/*.*; do
+      mv $artifact ${artifact/$VERSION/$VERSION.$RC};
+  done
+- source deploy_travis.sh
+- deploy
